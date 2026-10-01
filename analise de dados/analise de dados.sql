@@ -1,61 +1,52 @@
--- ================================================================
 -- ANÁLISE DE DADOS - TURMA 6
 -- Autor: Hilana Cavalcanti
 -- Ferramenta: DuckDB
 -- Fontes de dados: datatran2023.csv, datatran2024.csv, datatran2025.csv
 -- Objetivo: ingerir, integrar, limpar, enriquecer e analisar os
 -- acidentes da Polícia Rodoviária Federal de 2023 a 2025.
---
--- OBSERVAÇÃO:
--- Os três CSVs devem estar no diretório de execução do DuckDB e com os
--- nomes indicados acima. Os arquivos utilizam separador ";".
--- ================================================================
 
-
--- ================================================================
 -- PARTE 1 - INGESTÃO E INTEGRAÇÃO
--- ================================================================
 
 -- Importação dos três arquivos CSV e consolidação em uma única tabela.
 CREATE OR REPLACE TABLE acidentes_prf_historico AS
+
 SELECT *
-FROM read_csv_auto(
-    'datatran2023.csv',
+FROM read_csv(
+    'C:/Users/NATI PROAD/Downloads/analise de dados-20260924T153007Z-1-001/analise de dados/datatran2023/datatran2023.csv',
     delim = ';',
-    header = true
+    header = true,
+    encoding = 'latin-1'
 )
+
 UNION ALL
+
 SELECT *
-FROM read_csv_auto(
-    'datatran2024.csv',
+FROM read_csv(
+    'C:/Users/NATI PROAD/Downloads/analise de dados-20260924T153007Z-1-001/analise de dados/datatran2024/datatran2024.csv',
     delim = ';',
-    header = true
+    header = true,
+    encoding = 'latin-1'
 )
+
 UNION ALL
+
 SELECT *
-FROM read_csv_auto(
-    'datatran2025.csv',
+FROM read_csv(
+    'C:/Users/NATI PROAD/Downloads/analise de dados-20260924T153007Z-1-001/analise de dados/datatran2025/datatran2025.csv',
     delim = ';',
-    header = true
+    header = true,
+    encoding = 'latin-1'
 );
 
-
--- ================================================================
 -- PARTE 2 - LIMPEZA E SELEÇÃO DE COLUNAS
--- ================================================================
-
--- Remove as colunas administrativas e geodésicas que não serão
+-- Remove as colunas administrativas que não serão
 -- utilizadas na análise descritiva.
 CREATE OR REPLACE VIEW vw_acidentes_limpa AS
 SELECT
     * EXCLUDE (latitude, longitude, regional, delegacia, uop)
 FROM acidentes_prf_historico;
 
-
--- ================================================================
 -- PARTE 3 - ENGENHARIA DE RECURSOS
--- ================================================================
-
 -- Cria variáveis derivadas para facilitar as análises temporais,
 -- de severidade, fim de semana e períodos comemorativos.
 CREATE OR REPLACE VIEW vw_acidentes_enriquecida AS
@@ -106,10 +97,7 @@ SELECT
 
 FROM vw_acidentes_limpa v;
 
-
--- ================================================================
 -- PARTE 4 - QUESTÕES DE NEGÓCIO
--- ================================================================
 
 -- Questão 1 - Tendência anual e severidade:
 -- total de acidentes, total de mortos e taxa de letalidade por ano.
@@ -328,8 +316,3 @@ GROUP BY municipio
 ORDER BY total_acidentes_fatais DESC,
          total_vitimas_fatais DESC
 LIMIT 5;
-
-
--- ================================================================
--- FIM DO SCRIPT
--- ================================================================
